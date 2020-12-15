@@ -1,32 +1,31 @@
 "----------------------- Vim Plug -----------------------------
 call plug#begin()
 
-Plug 'scrooloose/nerdtree'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install()  }  }
+Plug 'junegunn/fzf.vim'
+Plug 'preservim/nerdtree'
 Plug 'sheerun/vim-polyglot'
+Plug 'HerringtonDarkholme/yats.vim'
 Plug 'preservim/nerdcommenter'
-Plug 'ctrlpvim/ctrlp.vim'
 Plug 'luochen1990/rainbow'
 Plug 'Yggdroot/indentLine'
 Plug 'itchyny/lightline.vim'
 Plug 'kaicataldo/material.vim'
 Plug 'ryanoasis/vim-devicons'
-Plug 'mhinz/vim-startify'
 Plug 'dense-analysis/ale'
 Plug 'maximbaz/lightline-ale'
 Plug 'ludovicchabant/vim-gutentags'
 Plug 'mattn/emmet-vim'
 Plug 'jiangmiao/auto-pairs'
-Plug 'tpope/vim-surround'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 call plug#end()
 "--------------------- Custom Settings -----------------------------
 "set omnifunc=syntaxcomplete#Complete
-set guifont=Fira\ Code
 set backspace=indent,eol,start " let backspace delete over lines
 set autoindent " enable auto indentation of lines
 set smartindent " allow vim to best-effort guess the indentation
 set ignorecase
-set autochdir
 set smartcase
 set number relativenumber " enable line numbers
 set hidden
@@ -34,11 +33,15 @@ set noshowmode
 set encoding=utf-8
 set laststatus=2
 set omnifunc=ale#completion#OmniFunc
+set re=0
+
+set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
 
 syntax on " enable highlighting
 
 let mapleader=" "
 
+autocmd FileType html,css EmmetInstall
 filetype on
 filetype plugin on
 filetype indent on
@@ -57,15 +60,21 @@ highlight ALEError ctermbg=RED ctermfg=BLACK
 """""""""""""""""""""""""" }}}
 
 """""""""""""""""""""""""""" Custom Keybindings {{{
+nnoremap <silent> <C-p> :Files<CR>
+nnoremap <silent> <Leader>f :Rg<CR>
+nnoremap <silent> <Leader>/ :BLines<CR>
+nnoremap <silent> <Leader>' :Marks<CR>
+nnoremap <silent> <Leader>g :Commits<CR>
+map <Leader>. :NERDTreeToggle<CR>
 map <Leader>p :ALEToggle<CR>
-nnoremap <Leader>f :NERDTreeToggle<Enter>
 nmap <silent> <leader>a :set nu! rnu!<CR>
-nnoremap gb :ls<CR>:b<Space>
+nnoremap <silent><Leader>b :Buffers<CR>
 noremap H g^
 noremap L g$
 map <Leader>s :source $MYVIMRC<CR>
-nnoremap <leader>. :CtrlPTag<cr>
 """""""""""""""""""""""""" }}}
+
+autocmd BufRead *.rs :setlocal tags=./rusty-tags.vi;/
 
 """""""""""""""""""""""" set indent for 2 spaces {{{
 set tabstop=2
@@ -74,8 +83,8 @@ set expandtab
 """""""""""""""""""""""""" }}}
 
 """"""""""""""""""""""""" CtrlP settings {{{
-let g:ctrlp_map = '<c-p>'
-let g:ctrlp_custom_ignore = 'node_modules\|DS_Store\|git'
+"let g:ctrlp_map = '<c-p>'
+"let g:ctrlp_custom_ignore = 'node_modules\|DS_Store\|git'
 """""""""""""""""""""""""" }}}
 
 """"""""""""""""""""""""" RainbowToggle {{{
@@ -95,30 +104,30 @@ let NERDTreeDirArrows = 1
 let g:webdevicons_conceal_nerdtree_brackets = 1
 """""""""""""""""""""""""" }}}
 
-""""""""""""""""""""""""""""" YCM Setup {{{
-"let g:ycm_show_diagnostics_ui = 0
-"let g:ycm_autoclose_preview_window_after_insertion = 1
-"let g:ycm_autoclose_preview_window_after_completion = 1
-"let g:ycm_filepath_completion_use_working_dir = 1 
-"let g:ycm_use_clangd = 1
-"""""""""""""""""""""""""" }}}
 """""""""""""""""""""""""""" VIM ALE Setup {{{
 let g:ale_lint_on_text_changed = 'never'
-let g:ale_lint_on_insert_leave = 0
+let g:ale_lint_on_insert_leave = 1
 let g:ale_fix_on_save = 1
 let g:ale_completion_enabled = 1
 let g:ale_completion_tsserver_autoimport = 1
 
 let g:ale_linters = {
   \   'javascript': ['eslint'],
+  \   'python': ['pylint'],
   \   'yaml': ['yamllint'],
   \   'rust': ['rls'],
+  \   'typescript': ['eslint'],
+  \   'typescriptreact': ['eslint'],
+  \   'javascriptreact': ['eslint'],
   \}
 let g:ale_fixers = {
   \   'javascript': ['prettier'],
   \   'sql': ['pgformatter'],
   \   'yaml': ['prettier'],
-  \   'rust': ['rustfmt']
+  \   'rust': ['rustfmt'],
+  \   'python': ['black'],
+  \   'java': ['google_java_format'],
+  \   'html': ['prettier'],
   \}
 
 nmap <silent> [c <Plug>(ale_previous_wrap)
@@ -130,6 +139,7 @@ let g:ale_sign_warning = '⚠️'
 """""""""""""""""""""""""""" }}}
 
 """""""""""""""""""""""""""""" Emmet Setup {{{
+let g:user_emmet_install_global = 0
 let g:user_emmet_leader_key=','
 
 """""""""""""""""""""""""""""" Lightline Setup {{{
@@ -168,3 +178,7 @@ let g:lightline = {
       \ },
       \ }
 """""""""""""""""""""""""" }}}
+"""""""""""""""""""""""""" Coc-snippets setup {{{
+" Use <C-j> for both expand and jump (make expand higher priority.)
+ imap <C-j> <Plug>(coc-snippets-expand)
+ """"""""""""""""""""""""""""""""""}}}
